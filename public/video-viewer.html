@@ -1,0 +1,123 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>يوفي كاش المحمية 🔒</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen p-6">
+
+  
+<h2 class="text-2xl md:text-3xl font-extrabold text-right text-green-700 leading-relaxed mb-6 rtl">
+  🚀 <span class="text-yellow-400">شاهد الفيديو الآن</span> لتفتح باب أرباحك!<br />
+  ✨ انضم إلى <span class="text-cyan-400 font-bold">Youvi Cash</span> وابدأ رحلتك التسويقية مع <span class="text-lime-400">YOUSIF TIGANI</span><br />
+  💸 احصل على <span class="text-pink-400">عمولات من كل إحالة</span> ومشاهدات مضمونة.<br />
+  🕒 فقط <span class="text-red-400 font-bold">30 ثانية</span> تفصلك عن الفرصة!
+</h2>
+
+
+  <h1 class="text-2xl font-bold text-green-600 mb-4">🎥 شاهد الفيديو دون تلاعب لمدة 30 ثانية</h1>
+  <div id="yt-player" class="w-full max-w-xl aspect-video mb-4"></div>
+  <div id="timer" class="text-xl font-bold text-blue-600 mb-4 text-center">⏳ 30 ثانية متبقية</div>
+
+  <div id="action" class="hidden text-center">
+    <a href="#" class="bg-green-600 text-white px-6 py-3 rounded-xl font-bold text-lg">
+      ✅ يمكنك الآن المتابعة
+    </a>
+  </div>
+
+  <script>
+    let player;
+    let countdown = 30;
+    let interval = null;
+    let secureInterval = null;
+    let allowedTime = 0;
+    let hasCompleted = false;
+
+    function resetCountdown(reason) {
+      clearInterval(interval);
+      clearInterval(secureInterval);
+      countdown = 30;
+      allowedTime = 0;
+      interval = null;
+      secureInterval = null;
+      if (!hasCompleted) {
+        alert(`🚫 تم اكتشاف محاولة غش: ${reason}، سيتم إعادة الفيديو من البداية.`);
+        player.pauseVideo();
+        player.seekTo(0);
+        document.getElementById('timer').textContent = '⏳ 30 ثانية متبقية';
+        document.getElementById('timer').classList.remove('text-red-600');
+        document.getElementById('timer').classList.add('text-blue-600');
+      }
+    }
+
+    function playSuccessSound() {
+      const audio = new Audio('https://cdn.pixabay.com/download/audio/2022/10/03/audio_ee78134803.mp3?filename=notification-110113.mp3');
+      audio.play();
+    }
+
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('yt-player', {
+        height: '360',
+        width: '640',
+        videoId: 'RUVLWmdgw1k',
+        playerVars: { autoplay: 1, controls: 1, rel: 0 },
+        events: {
+          onReady: () => {
+            player.setPlaybackRate(1);
+            player.playVideo();
+          },
+          onStateChange: onPlayerStateChange
+        }
+      });
+    }
+
+    function onPlayerStateChange(event) {
+      if (event.data === YT.PlayerState.PLAYING && !interval && !hasCompleted) {
+        interval = setInterval(() => {
+          countdown--;
+          const timerEl = document.getElementById('timer');
+          timerEl.textContent = `⏳ ${countdown} ثانية متبقية`;
+
+          if (countdown <= 10) {
+            timerEl.classList.remove('text-blue-600');
+            timerEl.classList.add('text-red-600');
+          }
+
+          if (countdown <= 0) {
+            clearInterval(interval);
+            clearInterval(secureInterval);
+            hasCompleted = true;
+            timerEl.textContent = '✅ تم الانتهاء من المشاهدة';
+            document.getElementById('action').classList.remove('hidden');
+            playSuccessSound();
+          }
+        }, 1000);
+
+        secureInterval = setInterval(() => {
+          const currentTime = Math.floor(player.getCurrentTime());
+          if (currentTime > allowedTime + 1) {
+            resetCountdown('تقديم الفيديو');
+          } else {
+            allowedTime = currentTime;
+          }
+        }, 1000);
+      } else if (event.data === YT.PlayerState.PAUSED && !hasCompleted) {
+        resetCountdown('إيقاف الفيديو قبل اكتماله');
+      }
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && !hasCompleted) {
+        resetCountdown('الخروج من الصفحة أو التبويب');
+      }
+    });
+
+    const tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    document.body.appendChild(tag);
+  </script>
+
+</body>
+</html>
