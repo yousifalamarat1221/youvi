@@ -1,10 +1,3 @@
-<<<<<<< HEAD
-import { ProtectedGate } from "@/components/protected-gate"
-
-export default function HomePage() {
-  return <ProtectedGate />
-}
-=======
 export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-50 to-green-100 text-gray-800 p-6">
@@ -26,4 +19,3 @@ export default function Home() {
     </main>
   );
 }
->>>>>>> 008814507e9df20a80650fa1380c46ca32316754
